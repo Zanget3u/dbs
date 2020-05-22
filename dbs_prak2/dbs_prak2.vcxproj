@@ -155,6 +155,9 @@
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="database.hpp" />
+    <ClInclude Include="entry.hpp" />
+    <ClInclude Include="liste.hpp" />
+    <ClInclude Include="tokenizer.hpp" />
   </ItemGroup>
   <Import Project="$(VCTargetsPath)\Microsoft.Cpp.targets" />
   <ImportGroup Label="ExtensionTargets">

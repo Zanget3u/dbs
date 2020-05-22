@@ -1,5 +1,6 @@
 #include "database.hpp"
 #include <iostream>
+#include "entry.hpp"
 
 //--private
 std::string Database::sqlStringConvert(const std::string& unconvertedString)
@@ -22,7 +23,7 @@ int Database::executeCommand(const std::string& command)
 	}
 	else
 	{
-		std::cout << "-> " << command << " wurde erfolgreich ausgefuehrt!" << std::endl;
+		//std::cout << "-> " << command << " wurde erfolgreich ausgefuehrt!" << std::endl;
 	}
 
 	return 0;
@@ -42,7 +43,7 @@ int Database::executeSelectWithIO(const std::string& selectCommand)
 	}
 	else
 	{
-		std::cout << "-> " << selectCommand << " wurde erfolgreich ausgefuehrt!" << std::endl;
+		//std::cout << "-> " << selectCommand << " wurde erfolgreich ausgefuehrt!" << std::endl;
 	}
 
 	// Ausgabe Ergebnisse
@@ -70,6 +71,21 @@ int Database::executeSelectWithoutIO(const std::string& selectCommand)
 	}
 	
 	return 0;
+}
+
+int Database::begin()
+{
+	return this->executeCommand("BEGIN");
+}
+
+int Database::commit()
+{
+	return this->executeCommand("COMMIT");
+}
+
+int Database::rollback()
+{
+	return this->executeCommand("ROLLBACK");
 }
 
 //--public
@@ -114,21 +130,6 @@ void Database::logout()
 	std::cout << "Erfolgreich aus Datenbank ausgeloggt!" << std::endl;
 }
 
-int Database::begin()
-{
-	return this->executeCommand("BEGIN");
-}
-
-int Database::commit()
-{
-	return this->executeCommand("COMMIT");
-}
-
-int Database::rollback()
-{
-	return this->executeCommand("ROLLBACK");
-}
-
 int Database::findhnr(const std::string& hnr)
 {
 	std::string command = "SELECT * FROM hersteller WHERE hnr = ";
@@ -160,9 +161,9 @@ int Database::insertEntry(const std::string& hnr, const std::string& name, const
 	command += this->sqlStringConvert(ort);
 	command += ");";
 
-	this->executeCommand(command);
+	int result = this->executeCommand(command);
 	
-	return 0;
+	return result;
 }
 
 int Database::deleteAllEntries()
@@ -173,4 +174,38 @@ int Database::deleteAllEntries()
 int Database::selectAllEntries()
 {
 	return this->executeSelectWithIO("SELECT * FROM hersteller;");
+}
+
+int Database::insertEntriesFromFile(const std::string& filepath)
+{
+	const auto entryVector = getDataFromFile(filepath);
+	//printEntriesFromVector(entryVector);
+	int entriesInserted = 0;
+	
+	for(entry e : *entryVector)
+	{
+		int result = this->insertEntry(e.hnr, e.name, e.plz, e.ort);
+		if (result == 0)
+			entriesInserted++;
+	}
+	std::cout << "Datensaetze: " << entryVector->size() << " / davon importiert: " << entriesInserted << std::endl;
+	
+	return 0;
+}
+
+void Database::printNumberOfEntries()
+{
+	PQclear(res);
+	std::string command = "SELECT * FROM hersteller;";	
+	res = PQexec(conn, command.c_str());
+
+	//Fehlerüberprüfung
+	if (PQresultStatus(res) != PGRES_TUPLES_OK)
+	{
+		std::cout << "Fehler bei Select-Abfrage!" << std::endl;
+	}
+	else
+	{
+		std::cout << "Anzahl der Tabellensaetze: " << PQntuples(res) << std::endl;
+	}
 }

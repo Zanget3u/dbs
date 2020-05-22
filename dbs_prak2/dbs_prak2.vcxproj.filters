@@ -26,5 +26,14 @@
     <ClInclude Include="database.hpp">
       <Filter>Headerdateien</Filter>
     </ClInclude>
+    <ClInclude Include="tokenizer.hpp">
+      <Filter>Headerdateien</Filter>
+    </ClInclude>
+    <ClInclude Include="liste.hpp">
+      <Filter>Headerdateien</Filter>
+    </ClInclude>
+    <ClInclude Include="entry.hpp">
+      <Filter>Headerdateien</Filter>
+    </ClInclude>
   </ItemGroup>
 </Project>
