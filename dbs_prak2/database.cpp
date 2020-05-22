@@ -17,13 +17,13 @@ int Database::executeCommand(const std::string& command)
 	//Fehlerüberprüfung
 	if (PQresultStatus(res) != PGRES_COMMAND_OK)
 	{
-		//std::cout << "-> " << command << " - ist fehlgeschlagen!" << std::endl;
-		//std::cout << PQerrorMessage(conn) << std::endl;
+		std::cout << "-> " << command << " - ist fehlgeschlagen!" << std::endl;
+		std::cout << PQerrorMessage(conn) << std::endl;
 		return 1;
 	}
 	else
 	{
-		//std::cout << "-> " << command << " wurde erfolgreich ausgefuehrt!" << std::endl;
+		std::cout << "-> " << command << " wurde erfolgreich ausgefuehrt!" << std::endl;
 	}
 	
 	return 0;
