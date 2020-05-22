@@ -214,7 +214,8 @@ int Database::insertEntriesFromFile(const std::string& filepath)
 	}	
 	
 	std::cout << "Datensaetze: " << entryVector->size() << " / davon importiert: " << entriesInserted << std::endl;
-	
+
+	delete entryVector;
 	return 0;
 }
 
@@ -253,5 +254,6 @@ int Database::deleteEntriesFromFile(const std::string& filepath)
 	}
 	std::cout << "Datensaetze: " << entryVector->size() << " / davon geloescht: " << entriesDeleted << std::endl;
 
+	delete entryVector;
 	return 0;
 }
