@@ -21,8 +21,10 @@ public:
 	void logout();	
 	int findhnr(const std::string& hnr);
 	int insertEntry(const std::string& hnr, const std::string& name, const std::string& plz, const std::string& ort);
+	int deleteEntry(const std::string& hnr);
 	int deleteAllEntries();
 	int selectAllEntries();
 	int insertEntriesFromFile(const std::string& filepath);
 	void printNumberOfEntries();
+	int deleteEntriesFromFile(const std::string& filepath);
 };

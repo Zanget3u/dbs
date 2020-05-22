@@ -161,8 +161,17 @@ int Database::insertEntry(const std::string& hnr, const std::string& name, const
 	command += this->sqlStringConvert(ort);
 	command += ");";
 
+	int result = this->executeCommand(command);	
+	return result;
+}
+
+int Database::deleteEntry(const std::string& hnr)
+{
+	std::string command = "DELETE FROM hersteller WHERE hnr = ";
+	command += this->sqlStringConvert(hnr);
+	command += " ;";
+
 	int result = this->executeCommand(command);
-	
 	return result;
 }
 
@@ -208,4 +217,21 @@ void Database::printNumberOfEntries()
 	{
 		std::cout << "Anzahl der Tabellensaetze: " << PQntuples(res) << std::endl;
 	}
+}
+
+int Database::deleteEntriesFromFile(const std::string& filepath)
+{
+	const auto entryVector = getDataFromFile(filepath);
+	//printEntriesFromVector(entryVector);
+	int entriesDeleted = 0;
+
+	for (entry e : *entryVector)
+	{
+		int result = this->deleteEntry(e.hnr);
+		if (result == 0)
+			entriesDeleted++;
+	}
+	std::cout << "Datensaetze: " << entryVector->size() << " / davon geloescht: " << entriesDeleted << std::endl;
+
+	return 0;
 }
