@@ -25,7 +25,7 @@ int Database::executeCommand(const std::string& command)
 	{
 		//std::cout << "-> " << command << " wurde erfolgreich ausgefuehrt!" << std::endl;
 	}
-
+	
 	return 0;
 }
 
@@ -167,11 +167,22 @@ int Database::insertEntry(const std::string& hnr, const std::string& name, const
 
 int Database::deleteEntry(const std::string& hnr)
 {
-	std::string command = "DELETE FROM hersteller WHERE hnr = ";
+	std::string command = "SELECT * FROM hersteller WHERE hnr = ";
 	command += this->sqlStringConvert(hnr);
 	command += " ;";
 
-	int result = this->executeCommand(command);
+	int result = this->executeSelectWithoutIO(command);
+
+	if(result == 0)
+	{
+		command = "DELETE FROM hersteller WHERE hnr = ";
+		command += this->sqlStringConvert(hnr);
+		command += " ;";
+
+		result = this->executeCommand(command);
+		return result;
+	}
+
 	return result;
 }
 
