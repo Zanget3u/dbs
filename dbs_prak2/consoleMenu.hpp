@@ -44,8 +44,16 @@ inline void ConsoleMenu::startMenu()
 	}
 	else if (_menuOption == 2)
 	{
+		std::string host, port, dbname, user, password;		
+		std::cout << "Bitte nachfolgend die Daten eingeben" << std::endl;
+		std::cout << "host: "; std::cin >> host;
+		std::cout << "port: "; std::cin >> port;
+		std::cout << "dbname: "; std::cin >> dbname;
+		std::cout << "user: "; std::cin >> user;
+		std::cout << "password: "; std::cin >> password;
+		_db->login(host, port, dbname, user, password);
 		_isLoggedIn = true;
-		std::cout << "Bitte in folgender Reihenfolge die Daten eingeben: host port dbname user password" << std::endl;
+		this->mainMenu();
 	}
 	else if (_menuOption == 3)
 	{
