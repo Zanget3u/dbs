@@ -17,8 +17,8 @@ int Database::executeCommand(const std::string& command)
 	//Fehlerüberprüfung
 	if (PQresultStatus(res) != PGRES_COMMAND_OK)
 	{
-		std::cout << "-> " << command << " - ist fehlgeschlagen!" << std::endl;
-		std::cout << PQerrorMessage(conn) << std::endl;
+		//std::cout << "-> " << command << " - ist fehlgeschlagen!" << std::endl;
+		//std::cout << PQerrorMessage(conn) << std::endl;
 		return 1;
 	}
 	else
@@ -200,14 +200,19 @@ int Database::insertEntriesFromFile(const std::string& filepath)
 {
 	const auto entryVector = getDataFromFile(filepath);
 	//printEntriesFromVector(entryVector);
-	int entriesInserted = 0;
+	int entriesInserted = 0;	
 	
 	for(entry e : *entryVector)
 	{
+		this->begin();
 		int result = this->insertEntry(e.hnr, e.name, e.plz, e.ort);
-		if (result == 0)
-			entriesInserted++;
-	}
+		
+		if (result == 0)		
+			entriesInserted++;			
+		
+		this->commit();
+	}	
+	
 	std::cout << "Datensaetze: " << entryVector->size() << " / davon importiert: " << entriesInserted << std::endl;
 	
 	return 0;
@@ -238,9 +243,13 @@ int Database::deleteEntriesFromFile(const std::string& filepath)
 
 	for (entry e : *entryVector)
 	{
+		this->begin();
 		int result = this->deleteEntry(e.hnr);
+		
 		if (result == 0)
 			entriesDeleted++;
+
+		this->commit();
 	}
 	std::cout << "Datensaetze: " << entryVector->size() << " / davon geloescht: " << entriesDeleted << std::endl;
 

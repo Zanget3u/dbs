@@ -20,11 +20,11 @@ int main(int argc, char* argv[])
 	
 	db.deleteEntriesFromFile("data/data2");
 	db.printNumberOfEntries();
-	std::cout << "--------------------------------------" << std::endl;
-	
-	/*db.deleteEntriesFromFile("data/data2");
+	std::cout << "--------------------------------------" << std::endl;	
+
+	db.insertEntriesFromFile("data/data3");
 	db.printNumberOfEntries();
-	std::cout << "--------------------------------------" << std::endl;*/
+	std::cout << "--------------------------------------" << std::endl;
 	
 	db.logout();
 	
