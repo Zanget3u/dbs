@@ -138,14 +138,16 @@ int Database::findhnr(const std::string& hnr)
 
 	int result = this->executeSelectWithoutIO(command);
 	
-	if (result == 0)
-		std::cout << "Der Eintrag " << hnr << " existiert!" << std::endl;
-	else if (result == 1)
+	if (result == 0)	
+		std::cout << "Der Eintrag " << hnr << " existiert!" << std::endl;	
+		
+	else if (result == 1)	
 		std::cout << "Es gab einen Fehler bei der Abfrage des Eintrags: " << hnr << std::endl;
-	else if(result == 2)
+			
+	else if(result == 2)	
 		std::cout << "Der Eintrag " << hnr << " existiert nicht!" << std::endl;
-	
-	return 0;
+		
+	return result;
 }
 
 int Database::insertEntry(const std::string& hnr, const std::string& name, const std::string& plz, const std::string& ort)
@@ -198,20 +200,38 @@ int Database::selectAllEntries()
 
 int Database::insertEntriesFromFile(const std::string& filepath)
 {
-	const auto entryVector = getDataFromFile(filepath);
-	//printEntriesFromVector(entryVector);
+	const auto entryVector = getDataFromFile(filepath);	
 	int entriesInserted = 0;	
+	bool insertError = false;
+	
+	this->begin();
 	
 	for(entry e : *entryVector)
 	{
-		this->begin();
-		int result = this->insertEntry(e.hnr, e.name, e.plz, e.ort);
+		int entryExists = this->findhnr(e.hnr);
 		
-		if (result == 0)		
-			entriesInserted++;			
-		
+		if(entryExists == 2) //If there is no entry with the same hnr
+		{			
+			int result = this->insertEntry(e.hnr, e.name, e.plz, e.ort);
+
+			if (result == 0)			
+				entriesInserted++;
+			
+			else if(result == 1)			
+				insertError = true;
+		}		
+	}
+	
+	if (insertError == true)
+	{
+		this->rollback();
+		entriesInserted = 0;
+		std::cout << "Transaktion wurde abgebrochen!" << std::endl;
+	}
+	else if (insertError == false)
+	{
 		this->commit();
-	}	
+	}
 	
 	std::cout << "Datensaetze: " << entryVector->size() << " / davon importiert: " << entriesInserted << std::endl;
 
@@ -239,19 +259,32 @@ void Database::printNumberOfEntries()
 int Database::deleteEntriesFromFile(const std::string& filepath)
 {
 	const auto entryVector = getDataFromFile(filepath);
-	//printEntriesFromVector(entryVector);
 	int entriesDeleted = 0;
+	bool deleteError = false;
 
+	this->begin();
+	
 	for (entry e : *entryVector)
-	{
-		this->begin();
+	{		
 		int result = this->deleteEntry(e.hnr);
 		
 		if (result == 0)
 			entriesDeleted++;
+		else if (result == 1)
+			deleteError = true;
+	}
 
+	if (deleteError == true)
+	{
+		this->rollback();
+		entriesDeleted = 0;
+		std::cout << "Transaktion wurde abgebrochen!" << std::endl;
+	}
+	else if (deleteError == false)
+	{
 		this->commit();
 	}
+	
 	std::cout << "Datensaetze: " << entryVector->size() << " / davon geloescht: " << entriesDeleted << std::endl;
 
 	delete entryVector;
